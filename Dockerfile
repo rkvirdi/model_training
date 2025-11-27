@@ -1,20 +1,17 @@
-# 1. Base image
 FROM python:3.10-slim
 
-# 2. Set working directory inside container
 WORKDIR /app
 
-# 3. Copy dependency file first (for caching)
-COPY requirements.txt .
+# Copy the FastAPI app
+COPY src/api.py /app/api.py
 
-# 4. Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy model
+COPY xgb_diabetes_model.pkl /app/
 
-# 5. Copy everything else
-COPY . .
+# Copy requirements
+COPY requirements.txt /app/
 
-# 6. Expose the port FastAPI will run on
-EXPOSE 8000
+RUN pip install -r requirements.txt
 
-# 7. Command to run the API
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start FastAPI (must use port 8080 for Lambda)
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
