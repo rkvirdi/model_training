@@ -1,12 +1,12 @@
 FROM public.ecr.aws/lambda/python:3.10
 
-# Install dependencies
-COPY requirements.txt .
+# Install Python dependencies
+COPY requirements.txt  .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy all source code
-COPY src/ ./src
-COPY xgboost_diabetes_model.pkl .
+# Copy your application code
+COPY src/ ${LAMBDA_TASK_ROOT}/
+COPY xgboost_diabetes_model.pkl ${LAMBDA_TASK_ROOT}/
 
-# Lambda handler command (ASGI)
-CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8080"]
+# Set handler
+CMD ["api.handler"]
