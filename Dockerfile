@@ -1,17 +1,12 @@
-FROM python:3.10-slim
+FROM public.ecr.aws/lambda/python:3.10
 
-WORKDIR /app
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy the FastAPI app
-COPY src/api.py /app/api.py
+# Copy all source code
+COPY src/ ./src
+COPY xgboost_diabetes_model.pkl .
 
-# Copy model
-COPY xgb_diabetes_model.pkl /app/
-
-# Copy requirements
-COPY requirements.txt /app/
-
-RUN pip install -r requirements.txt
-
-# Start FastAPI (must use port 8080 for Lambda)
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
+# Lambda handler command (ASGI)
+CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8080"]
