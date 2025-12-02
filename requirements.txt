@@ -1,5 +1,8 @@
-scikit-learn
-xgboost
 fastapi
 uvicorn
 mangum
+xgboost
+scikit-learn==1.2.2
+numpy<2
+joblib
+pydantic

@@ -1,20 +1,12 @@
-# 1. Base image
-FROM python:3.10-slim
+FROM public.ecr.aws/lambda/python:3.10
 
-# 2. Set working directory inside container
-WORKDIR /app
+# Install Python dependencies
+COPY requirements.txt  .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# 3. Copy dependency file first (for caching)
-COPY requirements.txt .
+# Copy your application code
+COPY src/ ${LAMBDA_TASK_ROOT}/
+COPY xgboost_diabetes_model.pkl ${LAMBDA_TASK_ROOT}/
 
-# 4. Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 5. Copy everything else
-COPY . .
-
-# 6. Expose the port FastAPI will run on
-EXPOSE 8000
-
-# 7. Command to run the API
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Set handler
+CMD ["api.handler"]
